@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Lost & Found Poster Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 24px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .image-upload-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .image-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 20px;
+            border: 2px dashed #667eea;
+            border-radius: 6px;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .image-upload-label:hover {
+            background: #f0f1ff;
+            border-color: #764ba2;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .image-preview.show {
+            display: block;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #2c3e50;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-print {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        .poster {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .poster-header {
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .college-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            color: #667eea;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .college-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .alert-banner {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            padding: 20px;
+            text-align: center;
+            color: white;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .poster-content {
+            padding: 30px 20px;
+        }
+
+        .item-image-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .item-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+            background: #f5f5f5;
+            min-height: 200px;
+        }
+
+        .no-image-placeholder {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .poster-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a3a52;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #667eea;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            color: #2c3e50;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .community-message {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+        }
+
+        .cta-banner {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            padding: 25px 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .poster-footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #7f8c8d;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .contact-emphasis {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid #667eea;
+            margin-top: 15px;
+        }
+
+        .contact-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .contact-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .contact-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        .contact-value {
+            font-size: 15px;
+            color: #2c3e50;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #28a745;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-section {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .poster-header {
+                padding: 20px 15px;
+            }
+
+            .college-logo {
+                width: 60px;
+                height: 60px;
+                font-size: 30px;
+            }
+
+            .college-name {
+                font-size: 16px;
+            }
+
+            .alert-banner {
+                font-size: 22px;
+                letter-spacing: 1px;
+            }
+
+            .poster-content {
+                padding: 20px 15px;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .community-message {
+                font-size: 16px;
+                padding: 15px;
+            }
+
+            .cta-banner {
+                font-size: 20px;
+                padding: 20px 15px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .form-section,
+            .controls,
+            .success-message {
+                display: none;
+            }
+
+            .poster {
+                box-shadow: none;
+                max-width: 100%;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-message" id="successMessage">
+            ✓ Poster data saved successfully!
+        </div>
+
+        <div class="form-section">
+            <h2>📋 Create Lost & Found Poster</h2>
+
+            <form id="posterForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="itemName">Item Name</label>
+                        <input type="text" id="itemName" placeholder="e.g., MacBook Pro" value="Apple MacBook Pro 16-inch" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dateTime">Date Lost</label>
+                        <input type="date" id="dateTime" value="2026-05-28" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timeLost">Time Lost</label>
+                        <input type="time" id="timeLost" value="14:30" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="locationLost">Location Lost</label>
+                        <input type="text" id="locationLost" placeholder="e.g., Library, Building A" value="Central Library, 3rd Floor Study Area" required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="description">Item Description</label>
+                    <textarea id="description" placeholder="Detailed description of the lost item..." required>Silver metallic finish with space gray keyboard. Contains important college work and personal data. Serial number visible on bottom.</textarea>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; color: #2c3e50; margin-bottom: 10px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Item Image</label>
+                    <div class="image-upload-label" for="imageInput">
+                        <span>📸 Click or drag image of the lost item</span>
+                    </div>
+                    <img id="imagePreview" class="image-preview" alt="Preview">
+                    <input type="file" id="imageInput" accept="image/*">
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="contactName">Contact Person Name</label>
+                        <input type="text" id="contactName" placeholder="Full name" value="Sarah Johnson" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" placeholder="e.g., +1 (555) 123-4567" value="+1 (555) 234-5678" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="e.g., student@college.edu" value="sarah.johnson@college.edu" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="department">Department/Class</label>
+                        <input type="text" id="department" placeholder="e.g., Computer Science, 2026" value="Computer Science - Class of 2026" required>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Generate Poster</button>
+                    <button type="reset" class="btn-secondary">Clear Form</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="poster" id="poster">
+            <div class="poster-header">
+                <div class="college-logo">🎓</div>
+                <div class="college-name">Premier College</div>
+                <div style="font-size: 12px; margin-top: 5px; opacity: 0.9; letter-spacing: 0.5px;">Campus Community Services</div>
+            </div>
+
+            <div class="alert-banner">🚨 CAMPUS LOST & FOUND ALERT 🚨</div>
+
+            <div class="poster-content">
+                <div class="item-image-container">
+                    <div id="itemImageDisplay" class="no-image-placeholder">📷 No image provided</div>
+                </div>
+
+                <div class="poster-section">
+                    <div class="section-title">📌 Item Details</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Item Name</div>
+                            <div class="detail-value" id="displayItemName">Apple MacBook Pro 16-inch</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Date Lost</div>
+                            <div class="detail-value" id="displayDate">May 28, 2026</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Time Lost</div>
+                            <div class="detail-value" id="displayTime">2:30 PM</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Location Lost</div>
+                            <div class="detail-value" id="displayLocation">Central Library, 3rd Floor Study Area</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-item" style="margin-top: 15px;">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value" id="displayDescription">Silver metallic finish with space gray keyboard. Contains important college work and personal data. Serial number visible on bottom.</div>
+                    </div>
+                </div>
+
+                <div class="community-message">
+                    ❤️ Help a Fellow Student Recover Their Belonging ❤️
+                </div>
+
+                <div class="poster-section">
+                    <div class="section-title">📞 Contact Information</div>
+                    <div class="contact-emphasis">
+                        <div class="contact-item">
+                            <div class="contact-label">Contact Person</div>
+                            <div class="contact-value" id="displayContact">Sarah Johnson</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-label">Phone Number</div>
+                            <div class="contact-value" id="displayPhone">+1 (555) 234-5678</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-label">Email Address</div>
+                            <div class="contact-value" id="displayEmail">sarah.johnson@college.edu</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-label">Department / Class</div>
+                            <div class="contact-value" id="displayDepartment">Computer Science - Class of 2026</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-banner" style="margin-top: 25px;">
+                    ✓ FOUND THIS ITEM? CONTACT IMMEDIATELY ✓
+                </div>
+            </div>
+
+            <div class="poster-footer">
+                <strong>Campus Lost & Found System</strong> | Report to Student Services | Office Hours: 9 AM - 5 PM, Monday - Friday
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-print" onclick="printPoster()">🖨️ Print Poster</button>
+            <button class="btn-print" style="background: #3498db;" onclick="downloadPoster()">⬇️ Download as Image</button>
+            <button class="btn-print" style="background: #9b59b6;" onclick="sharePoster()">📤 Share</button>
+        </div>
+    </div>
+
+    <script>
+        // Image upload handling
+        const imageInput = document.getElementById('imageInput');
+        const imageUploadLabel = document.querySelector('.image-upload-label');
+        const imagePreview = document.getElementById('imagePreview');
+        const itemImageDisplay = document.getElementById('itemImageDisplay');
+
+        // Click to upload
+        imageUploadLabel.addEventListener('click', () => imageInput.click());
+
+        // Drag and drop
+        imageUploadLabel.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            imageUploadLabel.style.background = '#f0f1ff';
+            imageUploadLabel.style.borderColor = '#764ba2';
+        });
+
+        imageUploadLabel.addEventListener('dragleave', () => {
+            imageUploadLabel.style.background = '#f8f9ff';
+            imageUploadLabel.style.borderColor = '#667eea';
+        });
+
+        imageUploadLabel.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                imageInput.files = files;
+                handleImageUpload();
+            }
+        });
+
+        // File input change
+        imageInput.addEventListener('change', handleImageUpload);
+
+        function handleImageUpload() {
+            const file = imageInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imgSrc = e.target.result;
+                    imagePreview.src = imgSrc;
+                    imagePreview.classList.add('show');
+
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    img.className = 'item-image';
+                    itemImageDisplay.innerHTML = '';
+                    itemImageDisplay.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Form submission
+        document.getElementById('posterForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            updatePoster();
+            showSuccessMessage();
+        });
+
+        function updatePoster() {
+            const itemName = document.getElementById('itemName').value;
+            const dateTime = document.getElementById('dateTime').value;
+            const timeLost = document.getElementById('timeLost').value;
+            const locationLost = document.getElementById('locationLost').value;
+            const description = document.getElementById('description').value;
+            const contactName = document.getElementById('contactName').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const department = document.getElementById('department').value;
+
+            document.getElementById('displayItemName').textContent = itemName;
+            document.getElementById('displayDate').textContent = formatDate(dateTime);
+            document.getElementById('displayTime').textContent = formatTime(timeLost);
+            document.getElementById('displayLocation').textContent = locationLost;
+            document.getElementById('displayDescription').textContent = description;
+            document.getElementById('displayContact').textContent = contactName;
+            document.getElementById('displayPhone').textContent = phone;
+            document.getElementById('displayEmail').textContent = email;
+            document.getElementById('displayDepartment').textContent = department;
+
+            savePosterData();
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString + 'T00:00:00').toLocaleDateString('en-US', options);
+        }
+
+        function formatTime(timeString) {
+            const [hours, minutes] = timeString.split(':');
+            const hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour % 12 || 12;
+            return `${displayHour}:${minutes} ${ampm}`;
+        }
+
+        function showSuccessMessage() {
+            const message = document.getElementById('successMessage');
+            message.classList.add('show');
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 3000);
+        }
+
+        function savePosterData() {
+            const data = {
+                itemName: document.getElementById('itemName').value,
+                dateTime: document.getElementById('dateTime').value,
+                timeLost: document.getElementById('timeLost').value,
+                locationLost: document.getElementById('locationLost').value,
+                description: document.getElementById('description').value,
+                contactName: document.getElementById('contactName').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                department: document.getElementById('department').value,
+                imageData: imagePreview.src || null
+            };
+            localStorage.setItem('posterData', JSON.stringify(data));
+        }
+
+        function loadPosterData() {
+            const saved = localStorage.getItem('posterData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('itemName').value = data.itemName;
+                document.getElementById('dateTime').value = data.dateTime;
+                document.getElementById('timeLost').value = data.timeLost;
+                document.getElementById('locationLost').value = data.locationLost;
+                document.getElementById('description').value = data.description;
+                document.getElementById('contactName').value = data.contactName;
+                document.getElementById('phone').value = data.phone;
+                document.getElementById('email').value = data.email;
+                document.getElementById('department').value = data.department;
+
+                if (data.imageData) {
+                    imagePreview.src = data.imageData;
+                    imagePreview.classList.add('show');
+                    const img = document.createElement('img');
+                    img.src = data.imageData;
+                    img.className = 'item-image';
+                    itemImageDisplay.innerHTML = '';
+                    itemImageDisplay.appendChild(img);
+                }
+
+                updatePoster();
+            }
+        }
+
+        function printPoster() {
+            window.print();
+        }
+
+        function downloadPoster() {
+            const poster = document.getElementById('poster');
+            const canvas = document.createElement('canvas');
+            const scale = 2;
+
+            canvas.width = poster.offsetWidth * scale;
+            canvas.height = poster.offsetHeight * scale;
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(scale, scale);
+
+            const html2Canvas = (element) => {
+                const serializer = new XMLSerializer();
+                const svgString = serializer.serializeToString(element);
+                const svg = new Blob([svgString], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(svg);
+                const img = new Image();
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0);
+                    downloadCanvasAsImage(canvas);
+                };
+                img.src = url;
+            };
+
+            const html2image = () => {
+                const itemName = document.getElementById('itemName').value;
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = `lost-found-${itemName.replace(/\s+/g, '-').toLowerCase()}.png`;
+                link.click();
+            };
+
+            html2image();
+        }
+
+        function downloadCanvasAsImage(canvas) {
+            const itemName = document.getElementById('itemName').value;
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = `lost-found-${itemName.replace(/\s+/g, '-').toLowerCase()}.png`;
+            link.click();
+        }
+
+        function sharePoster() {
+            const itemName = document.getElementById('itemName').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const shareText = `📢 HELP! LOST ITEM: ${itemName}\n\nContact: ${phone} or ${email}\n\nPlease share if you see this item!`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Campus Lost & Found Alert',
+                    text: shareText
+                }).catch((err) => console.log('Error sharing:', err));
+            } else {
+                // Fallback: Copy to clipboard
+                navigator.clipboard.writeText(shareText);
+                alert('Share text copied to clipboard!');
+            }
+        }
+
+        // Load saved data on page load
+        window.addEventListener('load', loadPosterData);
+    </script>
+</body>
+</html>
